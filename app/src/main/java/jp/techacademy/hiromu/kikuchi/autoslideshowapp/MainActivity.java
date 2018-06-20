@@ -61,23 +61,6 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getContentsInfo();
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,24 +84,35 @@ public class MainActivity extends AppCompatActivity {
 
         mAdvanceButton = (Button) findViewById(R.id.Advance_button);
         mBackButton = (Button) findViewById(R.id.Back_button);
-        mMainButton = (Button) findViewById(R.id.Main_button);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        Button button = (Button) findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                getContentsInfo();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            } else {
+                    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
+                        getContentsInfo();
+
+                    } else {
+
+                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
+
+                    }
+
+                } else {
+
+                    getContentsInfo();
+                }
             }
+        });
 
-        } else {
 
-            getContentsInfo();
-        }
+
 
         getContentsInfo();
 
@@ -198,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 2000, 2000);
 
-                    //停止の時の処理
+                    //停止時の処理
                 } else if (mTimer != null) {
                     mTimer.cancel();
                     mTimer = null;
@@ -216,6 +210,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getContentsInfo();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
