@@ -39,6 +39,24 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_REQUEST_CODE = 0;
 
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getContentsInfo();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+
     private void getContentsInfo() {
         ContentResolver resolver = getContentResolver();
         Cursor cursor = resolver.query(
@@ -62,35 +80,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+       resolver = getContentResolver();
+       cursor = resolver.query(
+               MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+               null,
+               null,
+               null,
+               null
 
-            resolver = getContentResolver();
-            cursor = resolver.query(
-
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-
-
+       );
 
         final Handler mHandler = new Handler();
 
         mAdvanceButton = (Button) findViewById(R.id.Advance_button);
         mBackButton = (Button) findViewById(R.id.Back_button);
+        mMainButton = (Button) findViewById(R.id.Main_button);
 
 
-
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -108,10 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
                     getContentsInfo();
                 }
-            }
-        });
-
-
 
 
         getContentsInfo();
@@ -211,19 +219,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CODE:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getContentsInfo();
-                }
-                break;
-            default:
-                break;
-        }
-    }
 
 
     @Override
