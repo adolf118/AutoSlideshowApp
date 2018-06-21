@@ -57,11 +57,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private void getContentsInfo() {
         ContentResolver resolver = getContentResolver();
         Cursor cursor = resolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                 null,
+                null,
                 null,
                 null,
                 null
@@ -80,21 +81,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       resolver = getContentResolver();
-       cursor = resolver.query(
-               MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-               null,
-               null,
-               null,
-               null
 
-       );
 
         final Handler mHandler = new Handler();
 
@@ -121,9 +113,17 @@ public class MainActivity extends AppCompatActivity {
                     getContentsInfo();
                 }
 
+                getContentsInfo();
 
-        getContentsInfo();
+        resolver = getContentResolver();
+        cursor = resolver.query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null,
+                null,
+                null,
+                null
 
+        );
 
         mAdvanceButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
 
 
 
