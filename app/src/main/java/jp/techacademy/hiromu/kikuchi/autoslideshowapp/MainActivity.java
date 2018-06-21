@@ -231,6 +231,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         cursor.close();
+
+        if (cursor != null) {
+            super.onDestroy();
+            cursor.close();
+        }
     }
 }
 
