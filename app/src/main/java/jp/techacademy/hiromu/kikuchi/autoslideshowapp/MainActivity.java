@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
@@ -56,36 +57,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-    private void getContentsInfo() {
-        ContentResolver resolver = getContentResolver();
-        Cursor cursor = resolver.query(
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-
-
-        if (cursor.moveToFirst()) {
-            int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-            Long id = cursor.getLong(fieldIndex);
-            Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-
-            ImageView imageView = (ImageView) findViewById(R.id.imageView);
-            imageView.setImageURI(imageUri);
-        }
-        cursor.close();
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
 
         final Handler mHandler = new Handler();
@@ -95,26 +70,22 @@ public class MainActivity extends AppCompatActivity {
         mMainButton = (Button) findViewById(R.id.Main_button);
 
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-                    if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-                        getContentsInfo();
-
-                    } else {
-
-                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
-
-                    }
-
-                } else {
-
-                    getContentsInfo();
-                }
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
                 getContentsInfo();
 
+            } else {
+
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_CODE);
+
+            }
+
+        }
+
+    }
+    public void getContentsInfo() {
         resolver = getContentResolver();
         cursor = resolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
@@ -122,105 +93,139 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 null,
                 null
-
         );
+        if (cursor.moveToFirst()) {
 
-        mAdvanceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+            Long id = cursor.getLong(fieldIndex);
+            Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
 
-                if (cursor.moveToNext()) {
-                    int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-                    Long id = cursor.getLong(fieldIndex);
-                    Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-
-                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
-                    imageView.setImageURI(imageUri);
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            imageView.setImageURI(imageUri);
+        }
 
 
+
+
+
+            mAdvanceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if (cursor.moveToNext()) {
+                        int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                        Long id = cursor.getLong(fieldIndex);
+                        Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+
+                        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                        imageView.setImageURI(imageUri);
+
+
+                    }
+                    if (cursor.moveToNext() == false) {
+
+                        cursor.moveToFirst();
+
+                        int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                        Long id = cursor.getLong(fieldIndex);
+                        Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+
+                        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                        imageView.setImageURI(imageUri);
+                    }
                 }
-                if (cursor.moveToNext() == false) {
 
-                    cursor.moveToFirst();
+            });
+
+            mBackButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (cursor.moveToPrevious()) {
+                        int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                        Long id = cursor.getLong(fieldIndex);
+                        Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+
+                        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                        imageView.setImageURI(imageUri);
+                    }
+                    if (cursor.moveToPrevious() == false) {
+
+                        cursor.moveToLast();
+
+                        int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                        Long id = cursor.getLong(fieldIndex);
+                        Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+
+                        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                        imageView.setImageURI(imageUri);
+                    }
                 }
-            }
+            });
 
-        });
+            mMainButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-        mBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (cursor.moveToPrevious()) {
-                    int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-                    Long id = cursor.getLong(fieldIndex);
-                    Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+                    if (mTimer == null) {
+                        mTimer = new Timer();
+                        mTimer.schedule(new TimerTask() {
 
-                    ImageView imageView = (ImageView) findViewById(R.id.imageView);
-                    imageView.setImageURI(imageUri);
-                }
-                if (cursor.moveToPrevious() == false) {
+                            @Override
+                            public void run() {
 
-                    cursor.moveToLast();
-                }
-            }
-        });
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
 
-        mMainButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                                        if (cursor.moveToNext()) {
+                                            int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                                            Long id = cursor.getLong(fieldIndex);
+                                            Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
 
-                if (mTimer == null) {
-                    mTimer = new Timer();
-                    mTimer.schedule(new TimerTask() {
+                                            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                                            imageView.setImageURI(imageUri);
 
-                        @Override
-                        public void run() {
+                                            mAdvanceButton.setEnabled(false);
+                                            mBackButton.setEnabled(false);
 
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
+                                            TextView mTextView = (TextView) findViewById(R.id.Main_button);
+                                            mTextView.setText("停止");
 
-                                    if (cursor.moveToNext()) {
-                                        int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
-                                        Long id = cursor.getLong(fieldIndex);
-                                        Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+                                        } else if (cursor.moveToNext() == false) {
 
-                                        ImageView imageView = (ImageView) findViewById(R.id.imageView);
-                                        imageView.setImageURI(imageUri);
+                                            cursor.moveToFirst();
 
-                                        mAdvanceButton.setEnabled(false);
-                                        mBackButton.setEnabled(false);
+                                            int fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID);
+                                            Long id = cursor.getLong(fieldIndex);
+                                            Uri imageUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
 
-                                        TextView mTextView = (TextView) findViewById(R.id.Main_button);
-                                        mTextView.setText("停止");
+                                            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                                            imageView.setImageURI(imageUri);
 
+                                        }
                                     }
-                                }
-                            });
-                        }
-                    }, 2000, 2000);
+                                });
+                            }
+                        }, 2000, 2000);
 
-                    //停止時の処理
-                } else if (mTimer != null) {
-                    mTimer.cancel();
-                    mTimer = null;
+                        //停止時の処理
+                    } else if (mTimer != null) {
+                        mTimer.cancel();
+                        mTimer = null;
 
-                    TextView mTextView = (TextView) findViewById(R.id.Main_button);
-                    mTextView.setText("再生");
+                        TextView mTextView = (TextView) findViewById(R.id.Main_button);
+                        mTextView.setText("再生");
 
-                    mAdvanceButton.setEnabled(true);
-                    mBackButton.setEnabled(true);
+                        mAdvanceButton.setEnabled(true);
+                        mBackButton.setEnabled(true);
+
+                    }
 
                 }
 
-            }
+            });
 
-        });
-
-    }
-
-
-
+        }
 
     @Override
     protected void onDestroy() {
